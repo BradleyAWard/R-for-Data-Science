@@ -63,3 +63,29 @@ ggplot(penguins, aes(x = species, y = body_mass_g)) +
 # A density plot of body mass by species
 ggplot(penguins, aes(x = body_mass_g, color = species, fill = species)) +
   geom_density(linewidth = 0.75, alpha = 0.5)
+
+# Code 10
+# A stacked bar chart for penguin species on different islands
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar()
+
+# A relative stacked bar chart for penguins species on different islands
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill")
+
+# Code 11
+# A scatterplot where color maps to species and shape maps to island
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = island))
+
+# Code 12
+# A scatterplot (as above), in separate subplots
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) + 
+  geom_point(aes(color = species, shape = island)) +
+  facet_wrap(~island)
+
+# Code 13
+# Saving a plot
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+ggsave(filename = "penguin-plot.png")

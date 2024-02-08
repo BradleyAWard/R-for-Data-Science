@@ -99,3 +99,35 @@ To visualize the relationship between a numerical and a categorical variable we 
 We show the distribution of body mass by species using a boxplot $\texttt{geom\_ boxplot()}$, or alternatively, we can make density plots with $\texttt{geom\_ density()}$. For the density plot we have customized the thickness of the lines using the $\texttt{linewidth}$ argument, additionally, we can map $\texttt{species}$ to both $\texttt{color}$ and $\texttt{fill}$ aesthetics and use the $\texttt{alpha}$ aesthetic to add transparency to the filled density curves. 
 
 [Code 9]
+
+#### Two Categorical Variables
+
+We can use stacked bar plots to visualize the relationship between two categorical variables. For example, the following two stacked bar plots both display the relationship between $\texttt{island}$ and $\texttt{species}$. The first plot shows the frequencies of each species of penguins on each island. The second plot is a relative frequency plot, created by setting $\texttt{position}$ = "$\texttt{fill}$" in the geom, and is more useful for comparing species distributions across islands since it is not affected by the unequal numbers of penguins across the islands. In creating these bar charts, we map the variable that will be separated into bars as the $\texttt{x}$ aesthetic, and the variable that will change the colors inside the bars to the $\texttt{fill}$ aesthetic.
+
+[Code 10]
+
+#### Three or More Variables
+
+As we have seen, we can incorporate more variables into a plot by mapping them to additional aesthetics. For example, in the following scatterplot the colors of points represent species, and the shapes of points represent islands.
+
+[Code 11]
+
+However, adding too many aesthetic mappings to a plot makes it cluttered and difficult to make sense of. Another option, which is particularly useful for categorical variables is to split your plot into *facets*, subplots that each display one subset of the data. To facet your plots by a single variables, use $\texttt{facet\_wrap()}$. The first argument is a formula, which you create with ~ followed by a variable name.
+
+[Code 12]
+
+---
+
+### Saving Your Plots
+
+Saving a plot as an image can be done using $\texttt{ggsave()}$, which will save the plot most recently created to your working directory.
+
+[Code 13]
+
+If you do not specify the $\texttt{width}$ and $\texttt{height}$, they will be taken from the dimensions of the current plotting device. For reproducible code, they should be specified.
+
+---
+
+### Summary
+
+In this chapter we covered the basics of data visualization with ggplot2. We started with the basic idea that a visualization is a mapping from variables in your data to aesthetic properties such as position, color, size and shape. We then increased the complexity and improving the presentation of your plots layer by layer. We saw commonly used plots for visualizing the distribution of a single variable, as well as for visualizing relationships between two or more variables, by levering additional aesthetic mappings and/or splitting your plot into subplots using faceting.
