@@ -40,29 +40,72 @@ ggplot(data = penguins,
   geom_point()
 ```
 
+![Alt text](../Outputs/Data_Visualization/Code_1.jpg)
+
 Let us review the warning message: "Removed 2 rows containing missing values ('geom_point()')". We are seeing this message because there are two penguins in our dataset with missing body mass and/or flipper length values. R and ggplot2 do not allow missing values to silently go missing. 
 
 #### Adding Aesthetics and Layers
 
 Let us incorporate species into our plot and see if this reveals any additional insights into the apparent relationship between these variables. To achieve this, we need to modify the aesthetic of the geom.
 
-[Code 2]
+```r
+# Code 2
+# An example plot of penguin flipper length by body mass (with colour)
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_point()
+```
+
+![Alt text](../Outputs/Data_Visualization/Code_2.jpg)
 
 When a categorical variable is mapped to an aesthetic, ggplot2 will automatically assign a unique value of the aesthetic (here a unique value) to each unique level of the variable (each of the three species), a process known as *scaling*.
 
 Let us add one more layer: a smooth curve displaying the relationship between body mass and flipper length. Since this is a new geometric object representing our data, we will add a new geom as a layer on top of our point geom: $\texttt{geom\_smooth()}$, and we will specify that we want to draw the line of best fit on a linear model with method = "lm".
 
-[Code 3]
+```r
+# Code 3
+# An example plot of penguin flipper length by body mass (with smooth fit)
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+![Alt text](../Outputs/Data_Visualization/Code_3.jpg)
 
 We have successfully added lines, but it has created separate lines for each of the penguin species. When aesthetic mappings are defined in $\texttt{ggplot()}$, at the *global* level, they are passed down to each of the subsequent geom layers of the plot. However, each geom function in ggplot2 can also take a $\texttt{mapping}$ argument, which allows for aesthetic mappings at the *local* level that are added to those inherited from the global level. To create a line for all points we should specify $\texttt{color = species}$ for $\texttt{geom\_point()}$ only.
 
-[Code 4]
+```r
+# Code 4
+# An example plot of penguin flipper length by body mass (with fit for species)
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(mapping = aes(color = species)) +
+  geom_smooth(method = "lm")
+```
+
+![Alt text](../Outputs/Data_Visualization/Code_4.jpg)
 
 If we wanted to use different shapes for each species of penguins we could map $\texttt{species}$ to the $\texttt{shape}$ aesthetic.
 
 Finally, we can improve the labels of our plot using the $\texttt{labs()}$ function in a new layer. Arguments that can be include: $\texttt{title}$, $\texttt{subtitle}$, $\texttt{x}$, $\texttt{y}$, and $\texttt{color}$ and $\texttt{shape}$, which define the label for the legend.
 
-[Code 5]
+```r
+# Code 5
+# An example plot of penguin flipper length by body mass (with labels)
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(mapping = aes(color = species)) +
+  geom_smooth(method = "lm") +
+  labs(title = "Body mass and flipper length",
+       subtitle = "Dimensions for Adelie, Chinstrap and Gentoo Penguins",
+       x = "Flipper length [mm]",
+       y = "Body mass [g]",
+       color = "Species",
+       shape = "Species")
+```
+
+![Alt text](../Outputs/Data_Visualization/Code_5.jpg)
 
 So far we have been very explicit in our calls to $\texttt{ggplot()}$. Typically, the first one or two arguments to a functions are so important they are known instinctively. The first two arguments to $\texttt{ggplot()}$ are $\texttt{data}$ and $\texttt{mapping}$; in future we will not supply those names.
 
@@ -76,17 +119,38 @@ How you visualize the distribution of a variable depends on the type of variable
 
 A variable is *categorical* if it can take only one of a small set of values. To examine the distribution of a categorical variable, you can use a bar chart. In bar plots of categorical values with unordered levels, it is often preferable to reorder the bars based on their frequencies. Doing so requires transforming the variable to a factor (how R handles categorical data) and then reordering the levels of that factor.
 
-[Code 6]
+```r
+# Code 6
+# Bar chart with ordered categorical variables
+ggplot(penguins, aes(x = fct_infreq(species))) +
+  geom_bar()
+```
+
+![Alt text](../Outputs/Data_Visualization/Code_6.jpg)
 
 #### A Numerical Variable
 
 A variable is *numerical* if it can take a wide range of numerical values and it is sensible to add, subtract, or take averages with those values. Numerical values can be continuous or discrete. One commonly used visualization for distributions of continuous variables is a histogram.
 
-[Code 7]
+```r
+# Code 7
+# A histogram of penguin body mass
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 200)
+```
+
+![Alt text](../Outputs/Data_Visualization/Code_7.jpg)
 
 An alternative visualization for distributions of numerical variables is a density plot. A density plot is a smoothed version of a histogram and a practical alternative for continuous data that comes from an underlying smooth distribution.
 
-[Code 8]
+```r
+# Code 8
+# A density plot of penguin body mass
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_density()
+```
+
+![Alt text](../Outputs/Data_Visualization/Code_8.jpg)
 
 ---
 
@@ -104,23 +168,63 @@ To visualize the relationship between a numerical and a categorical variable we 
 
 We show the distribution of body mass by species using a boxplot $\texttt{geom\_boxplot()}$, or alternatively, we can make density plots with $\texttt{geom\_density()}$. For the density plot we have customized the thickness of the lines using the $\texttt{linewidth}$ argument, additionally, we can map $\texttt{species}$ to both $\texttt{color}$ and $\texttt{fill}$ aesthetics and use the $\texttt{alpha}$ aesthetic to add transparency to the filled density curves. 
 
-[Code 9]
+```r
+# Code 9
+# A boxplot of body mass by species
+ggplot(penguins, aes(x = species, y = body_mass_g)) +
+  geom_boxplot()
+
+# A density plot of body mass by species
+ggplot(penguins, aes(x = body_mass_g, color = species, fill = species)) +
+  geom_density(linewidth = 0.75, alpha = 0.5)
+```
+
+![Alt text](../Outputs/Data_Visualization/Code_9a.jpg)
+
+![Alt text](../Outputs/Data_Visualization/Code_9b.jpg)
 
 #### Two Categorical Variables
 
 We can use stacked bar plots to visualize the relationship between two categorical variables. For example, the following two stacked bar plots both display the relationship between $\texttt{island}$ and $\texttt{species}$. The first plot shows the frequencies of each species of penguins on each island. The second plot is a relative frequency plot, created by setting $\texttt{position}$ = "$\texttt{fill}$" in the geom, and is more useful for comparing species distributions across islands since it is not affected by the unequal numbers of penguins across the islands. In creating these bar charts, we map the variable that will be separated into bars as the $\texttt{x}$ aesthetic, and the variable that will change the colors inside the bars to the $\texttt{fill}$ aesthetic.
 
-[Code 10]
+```r
+# Code 10
+# A stacked bar chart for penguin species on different islands
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar()
+
+# A relative stacked bar chart for penguins species on different islands
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill")
+```
+
+![Alt text](../Outputs/Data_Visualization/Code_10a.jpg)
+![Alt text](../Outputs/Data_Visualization/Code_10b.jpg)
 
 #### Three or More Variables
 
 As we have seen, we can incorporate more variables into a plot by mapping them to additional aesthetics. For example, in the following scatterplot the colors of points represent species, and the shapes of points represent islands.
 
-[Code 11]
+```r
+# Code 11
+# A scatterplot where color maps to species and shape maps to island
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = island))
+```
+
+![Alt text](../Outputs/Data_Visualization/Code_11.jpg)
 
 However, adding too many aesthetic mappings to a plot makes it cluttered and difficult to make sense of. Another option, which is particularly useful for categorical variables is to split your plot into *facets*, subplots that each display one subset of the data. To facet your plots by a single variables, use $\texttt{facet\_wrap()}$. The first argument is a formula, which you create with ~ followed by a variable name.
 
-[Code 12]
+```r
+# Code 12
+# A scatterplot (as above), in separate subplots
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) + 
+  geom_point(aes(color = species, shape = island)) +
+  facet_wrap(~island)
+```
+
+![Alt text](../Outputs/Data_Visualization/Code_12.jpg)
 
 ---
 
@@ -128,7 +232,13 @@ However, adding too many aesthetic mappings to a plot makes it cluttered and dif
 
 Saving a plot as an image can be done using $\texttt{ggsave()}$, which will save the plot most recently created to your working directory.
 
-[Code 13]
+```r
+# Code 13
+# Saving a plot
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+ggsave(filename = "penguin-plot.png")
+```
 
 If you do not specify the $\texttt{width}$ and $\texttt{height}$, they will be taken from the dimensions of the current plotting device. For reproducible code, they should be specified.
 
