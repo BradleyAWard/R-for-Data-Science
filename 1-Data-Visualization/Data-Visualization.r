@@ -6,6 +6,7 @@ library(palmerpenguins)
 ggplot(data = penguins,
        mapping = aes(x = flipper_length_mm, y = body_mass_g)) +
   geom_point()
+ggsave(filename = "Data_Visualization_code_1.jpg", dpi = 500)
 
 # Code 2
 # An example plot of penguin flipper length by body mass (with colour)

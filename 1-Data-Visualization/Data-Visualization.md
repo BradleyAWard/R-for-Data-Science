@@ -30,9 +30,15 @@ In this context, a variable refers to an attribute of all the penguins, and an o
 
 ### Creating a plot
 
-With *ggplot2*, you begin a plot with the function $\texttt{ggplot()}$, defining a plot object that you then add *layers* to. The first argument of $\texttt{ggplot()}$ is the dataset to use in the graph. Next, we need to tell $\texttt{ggplot()}$ how the information from our data will be visually represented. The $\texttt{mapping}$ argument of the function defines how variables in your dataset are mapped to the aesthetics of your plot. The $\texttt{mapping}$ argument is always defined in the $\texttt{aes()}$ function. Defining the observations from our data frame on our plot requires us to define a *geom*: the geometrical object that a plot uses to represent the data. People often describe plots by the type of geom that the plot uses. For example, bar charts use $\texttt{geom\_ bar()}$, line charts use $\texttt{geom\_ line()}$, boxplots use $\texttt{geom\_ boxplot()}$ and scatter plots use $\texttt{geom\_ point()}$. 
+With *ggplot2*, you begin a plot with the function $\texttt{ggplot()}$, defining a plot object that you then add *layers* to. The first argument of $\texttt{ggplot()}$ is the dataset to use in the graph. Next, we need to tell $\texttt{ggplot()}$ how the information from our data will be visually represented. The $\texttt{mapping}$ argument of the function defines how variables in your dataset are mapped to the aesthetics of your plot. The $\texttt{mapping}$ argument is always defined in the $\texttt{aes()}$ function. Defining the observations from our data frame on our plot requires us to define a *geom*: the geometrical object that a plot uses to represent the data. People often describe plots by the type of geom that the plot uses. For example, bar charts use $\texttt{geom\_bar()}$, line charts use $\texttt{geom\_line()}$, boxplots use $\texttt{geom\_boxplot()}$ and scatter plots use $\texttt{geom\_point()}$. 
 
-[Code 1]
+```r
+# Code 1
+# An example plot of penguin flipper length by body mass
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+```
 
 Let us review the warning message: "Removed 2 rows containing missing values ('geom_point()')". We are seeing this message because there are two penguins in our dataset with missing body mass and/or flipper length values. R and ggplot2 do not allow missing values to silently go missing. 
 
@@ -44,11 +50,11 @@ Let us incorporate species into our plot and see if this reveals any additional 
 
 When a categorical variable is mapped to an aesthetic, ggplot2 will automatically assign a unique value of the aesthetic (here a unique value) to each unique level of the variable (each of the three species), a process known as *scaling*.
 
-Let us add one more layer: a smooth curve displaying the relationship between body mass and flipper length. Since this is a new geometric object representing our data, we will add a new geom as a layer on top of our point geom: $\texttt{geom\_ smooth()}$, and we will specify that we want to draw the line of best fit on a linear model with method = "lm".
+Let us add one more layer: a smooth curve displaying the relationship between body mass and flipper length. Since this is a new geometric object representing our data, we will add a new geom as a layer on top of our point geom: $\texttt{geom\_smooth()}$, and we will specify that we want to draw the line of best fit on a linear model with method = "lm".
 
 [Code 3]
 
-We have successfully added lines, but it has created separate lines for each of the penguin species. When aesthetic mappings are defined in $\texttt{ggplot()}$, at the *global* level, they are passed down to each of the subsequent geom layers of the plot. However, each geom function in ggplot2 can also take a $\texttt{mapping}$ argument, which allows for aesthetic mappings at the *local* level that are added to those inherited from the global level. To create a line for all points we should specify $\texttt{color = species}$ for $\texttt{geom\_ point()}$ only.
+We have successfully added lines, but it has created separate lines for each of the penguin species. When aesthetic mappings are defined in $\texttt{ggplot()}$, at the *global* level, they are passed down to each of the subsequent geom layers of the plot. However, each geom function in ggplot2 can also take a $\texttt{mapping}$ argument, which allows for aesthetic mappings at the *local* level that are added to those inherited from the global level. To create a line for all points we should specify $\texttt{color = species}$ for $\texttt{geom\_point()}$ only.
 
 [Code 4]
 
@@ -96,7 +102,7 @@ To visualize the relationship between a numerical and a categorical variable we 
 - Visual points that display observations that fall more than 1.5 times the IQR from either edge of the box.
 - A line that extends from each end of the box and goes to the farthest nonoutlier point in your distribution.
 
-We show the distribution of body mass by species using a boxplot $\texttt{geom\_ boxplot()}$, or alternatively, we can make density plots with $\texttt{geom\_ density()}$. For the density plot we have customized the thickness of the lines using the $\texttt{linewidth}$ argument, additionally, we can map $\texttt{species}$ to both $\texttt{color}$ and $\texttt{fill}$ aesthetics and use the $\texttt{alpha}$ aesthetic to add transparency to the filled density curves. 
+We show the distribution of body mass by species using a boxplot $\texttt{geom\_boxplot()}$, or alternatively, we can make density plots with $\texttt{geom\_density()}$. For the density plot we have customized the thickness of the lines using the $\texttt{linewidth}$ argument, additionally, we can map $\texttt{species}$ to both $\texttt{color}$ and $\texttt{fill}$ aesthetics and use the $\texttt{alpha}$ aesthetic to add transparency to the filled density curves. 
 
 [Code 9]
 
