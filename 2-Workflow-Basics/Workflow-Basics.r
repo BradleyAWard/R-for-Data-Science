@@ -7,3 +7,6 @@ primes * 2
 
 # Subtract 1
 primes - 1
+
+# Sequence from 1 to 10
+seq(1, 10)
