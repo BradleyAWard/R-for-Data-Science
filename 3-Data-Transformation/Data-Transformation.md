@@ -1,0 +1,142 @@
+## 3) Data Transformation
+
+Visualization is an important tool for generating insight, but it is rare that you get the data in exactly the right form you need to make the graph you want. Often you will need to create some new variables or summaries to answer your questions with your data. We shall introduce data transformation using the dplyr package and use a new dataset on flights that departed New York City in 2013.
+
+Take careful note of the conflict message that is printed when you load the tidyverse. It tells you that dplyr overwrites some functions in base R. If you want to use the base version of these functions after loading dplyr, you will need to use their full names, such as $\texttt{stats::filter()}$.
+
+---
+
+### nycflights13
+
+To explore the basic dplyr verbs, we are going to use $\texttt{nycflights13::flights}$. This dataset contains all 336,776 flights that departed from New York City in 2013. $\texttt{flights}$ is a tibble, a special type of data frame used by the tidyverse to avoid some common gotchas. They are designed for large datasets, so when printing they only show the first few rows and only the columns that fit on one screen. If you are using RStudio, the most convenient way to view the full dataset is $\texttt{View(flights)}$, which will open an interactive scrollable and filterable view. Otherwise, you can use $\texttt{print(flights, width = inf)}$ to show all columns or $\texttt{glimpse()}$. In these views, the variables are followed by the variable type: $\texttt{<int>}$ for integer, $\texttt{<dbl>}$ for double (real numbers), $\texttt{<chr>}$ for character (strings), and $\texttt{<dttm>}$ for date-time.
+
+---
+
+### dplyr Basics
+
+The vast majority of your data manipulation challenges can be solved with the primary dplyr verbs. They all have things in common:
+
+- The first argument is always a data frame.
+- The subsequent  arguments typically describe which columns to operate on, using the variable names (without quotes).
+- The output is always a new data frame.
+
+Because each verb does one thing well, solving complex problems will usually require combining multiple verbs, and we will do so with the pipe, |>. dplyr's verbs are organized into four groups based on what they operate on: *rows*, *columns*, *groups* and *tables*. 
+
+---
+
+### Rows
+
+The most important verbs that operate on rows of a dataset are $\texttt{filter()}$, which changes which rows are present without changing their order, and $\texttt{arrange()}$ which changes the order of the rows without changing which are present. We will also discuss $\texttt{distinct()}$, which finds rows with unique values, but unlike $\texttt{arrange()}$ and $\texttt{filter()}$, it can also  optionally modify the columns.
+
+#### $\texttt{filter()}$
+
+$\texttt{filter()}$ allows you to keep rows based on the values of the columns. The first argument is the data frame. The second and subsequent arguments are the conditions that must be true to keep the row.
+
+```r
+# Code 1
+# All flights that departed more than two hours late
+flights |>
+  filter(dep_delay > 120)
+
+# Flights that departed on 1st January
+flights |>
+  filter(month == 1 & day == 1)
+
+# FLights that departed in January or February
+flights |>
+  filter(month == 1 | month == 2)
+```
+
+The operators that you can use include >, >=, <, <=, == and !=. You can also combine conditions with & or , to indicate "and" or | to indicate "or". There is a useful shortcut when you are combining | and ==, namely %in%. It keeps rows where the variable equals one of the values on the right:
+
+```r
+# Code 2
+# Flights that departed in January or February
+flights |>
+  filter(month %in% c(1, 2))
+```
+
+When you run $\texttt{filter()}$, dplyr executes the filtering operation, creating a new data frame and then prints it. dplyr functions never modify their inputs, so to save the result you need to use the assignment operator.
+
+#### $\texttt{arrange()}$
+
+$\texttt{arrange()}$ changes the order of the rows based on the value of the columns. It takes a date frame and a set of column names to order by. If you provide more than one column name, each additional column will be used to break ties in the values of preceding columns. For example, the following code sorts the data by the departure time:
+
+```r
+# Code 3
+# Sort the flights by departure time
+flights |>
+  arrange(year, month, day, dep_time)
+```
+
+```output
+# A tibble: 336,776 × 19
+    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+   <int> <int> <int>    <int>          <int>     <dbl>    <int>          <int>
+ 1  2013     1     1      517            515         2      830            819
+ 2  2013     1     1      533            529         4      850            830
+ 3  2013     1     1      542            540         2      923            850
+ 4  2013     1     1      544            545        -1     1004           1022
+ 5  2013     1     1      554            600        -6      812            837
+ 6  2013     1     1      554            558        -4      740            728
+ 7  2013     1     1      555            600        -5      913            854
+ 8  2013     1     1      557            600        -3      709            723
+ 9  2013     1     1      557            600        -3      838            846
+10  2013     1     1      558            600        -2      753            745
+# ℹ 336,766 more rows
+# ℹ 11 more variables: arr_delay <dbl>, carrier <chr>, flight <int>,
+#   tailnum <chr>, origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>,
+#   hour <dbl>, minute <dbl>, time_hour <dttm>
+# ℹ Use `print(n = ...)` to see more rows
+```
+
+You can use $\texttt{desc()}$ on a column inside of $\texttt{arrange()}$ to reorder the data frame based on that column in descending order. For example, this code orders flights from most to least delayed:
+
+```r
+# Code 4
+# Order the flights from most to least delayed
+flights |>
+  arrange(desc(dep_delay))
+```
+
+```output
+# A tibble: 336,776 × 19
+    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+   <int> <int> <int>    <int>          <int>     <dbl>    <int>          <int>
+ 1  2013     1     9      641            900      1301     1242           1530
+ 2  2013     6    15     1432           1935      1137     1607           2120
+ 3  2013     1    10     1121           1635      1126     1239           1810
+ 4  2013     9    20     1139           1845      1014     1457           2210
+ 5  2013     7    22      845           1600      1005     1044           1815
+ 6  2013     4    10     1100           1900       960     1342           2211
+ 7  2013     3    17     2321            810       911      135           1020
+ 8  2013     6    27      959           1900       899     1236           2226
+ 9  2013     7    22     2257            759       898      121           1026
+10  2013    12     5      756           1700       896     1058           2020
+# ℹ 336,766 more rows
+# ℹ 11 more variables: arr_delay <dbl>, carrier <chr>, flight <int>,
+#   tailnum <chr>, origin <chr>, dest <chr>, air_time <dbl>, distance <dbl>,
+#   hour <dbl>, minute <dbl>, time_hour <dttm>
+# ℹ Use `print(n = ...)` to see more rows
+```
+
+#### $\texttt{distinct()}$
+
+$\texttt{distinct()}$ finds all the unique rows in a dataset. Most of the time, however, you will want the distinct combination of some variables, so you can also optionally supply column names:
+
+```r
+# Code 5
+# Remove all duplicate rows
+flights |>
+  distinct()
+
+# Find all unique combinations of origin and destination
+flights |>
+  distinct(origin, dest)
+```
+
+Alternatively, if you want to keep the other columns when filtering for unique rows, you can use the $\texttt{.keep\_all}$ = TRUE option. If you want to find the number of occurrences instead, you are better off swapping $\texttt{distinct()}$ for $\texttt{count()}$, and with the $\texttt{sort}$ = TRUE argument you can arrange them in descending order of number of occurrences.
+
+---
+
+### Columns
