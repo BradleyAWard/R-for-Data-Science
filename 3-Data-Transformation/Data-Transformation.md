@@ -140,3 +140,118 @@ Alternatively, if you want to keep the other columns when filtering for unique r
 ---
 
 ### Columns
+
+There are four important verbs that affect the columns without changing the rows: $\texttt{mutate()}$ creates new columns that are derived from the existing columns, $\texttt{select()}$ changes which columns are present, $\texttt{rename()}$ changes the names of the columns and $\texttt{relocate()}$ changes the positions of the columns.
+
+#### $\texttt{mutate()}$
+
+The job of $\texttt{mutate()}$ is to add new columns that are calculated from the existing columns. In the following we use $\texttt{mutate()}$ to calculate the gain (how much time a delayed flight made up in the air) and average speed.
+
+```r
+# Code 6
+# Create new columns for gain an average speed
+flights |>
+  mutate(gain = dep_delay - arr_delay,
+         speed = distance / air_time * 60,
+         .before = 1)
+```
+
+```output
+# A tibble: 336,776 × 21
+    gain speed  year month   day dep_time sched_dep_time dep_delay arr_time
+   <dbl> <dbl> <int> <int> <int>    <int>          <int>     <dbl>    <int>
+ 1    -9  370.  2013     1     1      517            515         2      830
+ 2   -16  374.  2013     1     1      533            529         4      850
+ 3   -31  408.  2013     1     1      542            540         2      923
+ 4    17  517.  2013     1     1      544            545        -1     1004
+ 5    19  394.  2013     1     1      554            600        -6      812
+ 6   -16  288.  2013     1     1      554            558        -4      740
+ 7   -24  404.  2013     1     1      555            600        -5      913
+ 8    11  259.  2013     1     1      557            600        -3      709
+ 9     5  405.  2013     1     1      557            600        -3      838
+10   -10  319.  2013     1     1      558            600        -2      753
+# ℹ 336,766 more rows
+# ℹ 12 more variables: sched_arr_time <int>, arr_delay <dbl>, carrier <chr>,
+#   flight <int>, tailnum <chr>, origin <chr>, dest <chr>, air_time <dbl>,
+#   distance <dbl>, hour <dbl>, minute <dbl>, time_hour <dttm>
+# ℹ Use `print(n = ...)` to see more rows
+```
+
+By default, $\texttt{mutate()}$ adds new columns on the right side of your dataset. We can use the $\texttt{.before}$ argument to add the variables to the left side. The . is a sign that $\texttt{.before}$ is an argument to the function, not the name of a new variable. You can also use $\texttt{.after}$ to add after a variable, and in both $\texttt{.before}$ and $\texttt{.after}$ you can use the variable name instead of a position. Alternatively, you can control which variables are kept with the $\texttt{.keep}$ argument. A particularly useful argument is $\texttt{.keep}$ = "used", which specifies that we keep only the columns that were involved or created in the $\texttt{mutate()}$ step.
+
+#### $\texttt{select()}$
+
+It is not uncommon to get datasets with hundreds of variables. In this situation, the first challenge is often just focusing on the variables you are interested in. $\texttt{select()}$ allows you to rapidly zoom in on a useful subset using operations based on the names of the variables:
+
+```r
+# Code 7
+# Select columns by name
+flights |>
+  select(year, month, day)
+
+# Select all columns between year and day (inclusive)
+flights |>
+  select(year:day)
+
+# Select all columns except those from year to day
+flights |>
+  select(!year:day)
+
+# Select all columns that are characters
+flights |>
+  select(where(is.character))
+```
+
+There are a number of helper functions you can use within select: $\texttt{starts\_with("abc")}$ - matches names that begin with "abc"; $\texttt{ends\_with("abc")}$ - matches names that end with "abc"; $\texttt{contains("abc")}$ - matches names that contain "abc"; $\texttt{num\_range("x", 1:3)}$ - matches x1, x2 and x3.
+
+You can rename variables as you $\texttt{select()}$ them using =. The new name appears on the left side of the =, and the old variable appears on the right side.
+
+#### $\texttt{rename()}$
+
+If you want to keep all the existing variables and just want to rename a few, you can use $\texttt{rename()}$ instead of $\texttt{select()}$. If you have a bunch of inconsistently named columns and it would be painful to fix them all by hand, $\texttt{janitor::clean\_names()}$ provides some useful automated cleaning.
+
+#### $\texttt{relocate()}$
+
+Use $\texttt{relocate}$ to move variables around. You might want to collect related variables together or move important variables to the front. By default $\texttt{relocate()}$ moves variables to the front. You can also specify where to put them using the $\texttt{.before}$ and $\texttt{.after}$ arguments just like in $\texttt{mutate()}$.
+
+---
+
+### The Pipe
+
+The pipe is a powerful tool for combining multiple verbs. For example, imagine that you wanted to find the fastest flights to Houston's IAH airport: you need to combine $\texttt{filter()}$, $\texttt{mutate()}$, $\texttt{select()}$ and $\texttt{arrange()}$:
+
+```r
+# Code 8
+# Combining verbs with the pipe
+flights |>
+  filter(dest == "IAH") |>
+  mutate(speed = distance / air_time * 60) |>
+  select(year:day, dep_time, carrier, flight, speed) |>
+  arrange(desc(speed))
+```
+
+```output
+# A tibble: 7,198 × 7
+    year month   day dep_time carrier flight speed
+   <int> <int> <int>    <int> <chr>    <int> <dbl>
+ 1  2013     7     9      707 UA         226  522.
+ 2  2013     8    27     1850 UA        1128  521.
+ 3  2013     8    28      902 UA        1711  519.
+ 4  2013     8    28     2122 UA        1022  519.
+ 5  2013     6    11     1628 UA        1178  515.
+ 6  2013     8    27     1017 UA         333  515.
+ 7  2013     8    27     1205 UA        1421  515.
+ 8  2013     8    27     1758 UA         302  515.
+ 9  2013     9    27      521 UA         252  515.
+10  2013     8    28      625 UA         559  515.
+# ℹ 7,188 more rows
+# ℹ Use `print(n = ...)` to see more rows
+```
+
+> The %>% pipe provided by the magrittr package is included in the core tidyverse. For simple cases, |> and %>% behave identically, however, we recommend the base pipe |>, first, because it is part of base R and so os always available to use, and second, it is simpler than %>%.
+
+---
+
+### Groups
+
+dplyr gets more powerful when you add in the ability to work with groups. Here we will focus on the most important functions: $\texttt{group\_by()}$, $\texttt{summarize()}$ and the slice family of functions.

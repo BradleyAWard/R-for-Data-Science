@@ -37,4 +37,35 @@ flights |>
 # Find all unique combinations of origin and destination
 flights |>
   distinct(origin, dest)
-  
+
+# Code 6
+# Create new columns for gain an average speed
+flights |>
+  mutate(gain = dep_delay - arr_delay,
+         speed = distance / air_time * 60,
+         .before = 1)
+
+# Code 7
+# Select columns by name
+flights |>
+  select(year, month, day)
+
+# Select all columns between year and day (inclusive)
+flights |>
+  select(year:day)
+
+# Select all columns except those from year to day
+flights |>
+  select(!year:day)
+
+# Select all columns that are characters
+flights |>
+  select(where(is.character))
+
+# Code 8
+# Combining verbs with the pipe
+flights |>
+  filter(dest == "IAH") |>
+  mutate(speed = distance / air_time * 60) |>
+  select(year:day, dep_time, carrier, flight, speed) |>
+  arrange(desc(speed))
