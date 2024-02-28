@@ -69,3 +69,32 @@ flights |>
   mutate(speed = distance / air_time * 60) |>
   select(year:day, dep_time, carrier, flight, speed) |>
   arrange(desc(speed))
+
+# Code 9
+# The average delay of flights by month
+flights |>
+  group_by(month) |>
+  summarize(n = n(),
+            delay = mean(dep_delay, na.rm = TRUE))
+
+# Code 10
+# Takes the first row from each group
+df |> slice_head(n = 1)
+
+# Takes the last row in each group
+df |> slice_tail(n = 1)
+
+# Takes the row with the smallest value of column x
+df |> slice_min(x, n = 1)
+
+# Takes the row with the largest value of column x
+df |> slice_max(x, n = 1)
+
+# Takes one random row
+df |> slice_sample(n = 1)
+
+# Code 11
+flights |>
+  group_by(dest) |>
+  slice_max(arr_delay, n = 1, with_ties = FALSE) |>
+  relocate(dest)

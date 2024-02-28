@@ -255,3 +255,98 @@ flights |>
 ### Groups
 
 dplyr gets more powerful when you add in the ability to work with groups. Here we will focus on the most important functions: $\texttt{group\_by()}$, $\texttt{summarize()}$ and the slice family of functions.
+
+#### $\texttt{group\_by()}$
+
+Use $\texttt{group\_by()}$ to divide your dataset into groups meaningful for your analysis. $\texttt{group\_by()}$ does not change the data, but all subsequent operations will now work on the groupings. $\texttt{group\_by()}$ adds this grouped feature (referred to as *class*) to the data frame, which changes the behaviour of the subsequent verbs applied to the data. 
+
+#### $\texttt{summarize()}$
+
+The most important grouped operation is a summary, which, if being used to calculate a single summary statistic, reduces the data frame to have a single row for each group. Often you will find that all results from $\texttt{summarize()}$ return NAs. This happens when some of the data has missing values, so when calculating summary statistics, we get an NA result. We can tell the function to ignore all missing values by setting the argument $\texttt{na.rm}$ to TRUE. You can create any number of summaries in a single call to $\texttt{summarize()}$; one useful summary is $\texttt{n()}$, which returns the number of rows in each group.
+
+```r
+# Code 9
+# The average delay of flights by month
+flights |>
+  group_by(month) |>
+  summarize(n = n(),
+            delay = mean(dep_delay, na.rm = TRUE))
+```
+
+```output
+# A tibble: 12 × 3
+   month     n delay
+   <int> <int> <dbl>
+ 1     1 27004 10.0 
+ 2     2 24951 10.8 
+ 3     3 28834 13.2 
+ 4     4 28330 13.9 
+ 5     5 28796 13.0 
+ 6     6 28243 20.8 
+ 7     7 29425 21.7 
+ 8     8 29327 12.6 
+ 9     9 27574  6.72
+10    10 28889  6.24
+11    11 27268  5.44
+12    12 28135 16.6 
+```
+
+#### The Slice Functions
+
+There are five handy functions that allow you to extract specific rows within each group:
+
+```r
+# Code 10
+# Takes the first row from each group
+df |> slice_head(n = 1)
+
+# Takes the last row in each group
+df |> slice_tail(n = 1)
+
+# Takes the row with the smallest value of column x
+df |> slice_min(x, n = 1)
+
+# Takes the row with the largest value of column x
+df |> slice_max(x, n = 1)
+
+# Takes one random row
+df |> slice_sample(n = 1)
+```
+
+You can vary $\texttt{n}$ to select more than one row, or you can use $\texttt{prop}$ to select a fraction between 0 and 1 of the rows in each group. The following example finds the flights that are most delayed upon arrival at each destination:
+
+```r
+# Code 11
+flights |>
+  group_by(dest) |>
+  slice_max(arr_delay, n = 1, with_ties = FALSE) |>
+  relocate(dest)
+```
+
+```output
+# A tibble: 105 × 19
+# Groups:   dest [105]
+   dest   year month   day dep_time sched_dep_time dep_delay arr_time
+   <chr> <int> <int> <int>    <int>          <int>     <dbl>    <int>
+ 1 ABQ    2013     7    22     2145           2007        98      132
+ 2 ACK    2013     7    23     1139            800       219     1250
+ 3 ALB    2013     1    25      123           2000       323      229
+ 4 ANC    2013     8    17     1740           1625        75     2042
+ 5 ATL    2013     7    22     2257            759       898      121
+ 6 AUS    2013     7    10     2056           1505       351     2347
+ 7 AVL    2013     8    13     1156            832       204     1417
+ 8 BDL    2013     2    21     1728           1316       252     1839
+ 9 BGR    2013    12     1     1504           1056       248     1628
+10 BHM    2013     4    10       25           1900       325      136
+# ℹ 95 more rows
+# ℹ 11 more variables: sched_arr_time <int>, arr_delay <dbl>, carrier <chr>,
+#   flight <int>, tailnum <chr>, origin <chr>, air_time <dbl>, distance <dbl>,
+#   hour <dbl>, minute <dbl>, time_hour <dttm>
+# ℹ Use `print(n = ...)` to see more rows
+```
+
+We have used $\texttt{with\_ties}$ = FALSE to keep exactly one row per group, otherwise tied rows would both be included. This method is similar to computing the max delay with $\texttt{summarize()}$, but you get the whole corresponding row instead of a single summary statistic.
+
+You can create groups using more than one variable. When you summarize a tibble grouped by more than one variable, each summary peels off the last group. To make it obvious what is happening dplyr displays a message that tells you how you can change this behaviour. To change the default behaviour we can set $\texttt{.groups}$ to "$\texttt{drop}$" ro drop all groupings or "$\texttt{keep}$" to preserve the same groups.
+
+You might also want to remove grouping from a data frame without using $\texttt{summarize()}$. You can do this with $\texttt{ungroup()}$. When you summarize an ungrouped data frame you get a single row back because dplyr treats all rows in an ungrouped data frame as belonging to one group.
