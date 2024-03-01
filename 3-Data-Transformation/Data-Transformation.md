@@ -317,6 +317,7 @@ You can vary $\texttt{n}$ to select more than one row, or you can use $\texttt{p
 
 ```r
 # Code 11
+# Flights that are most delayed upon arrival
 flights |>
   group_by(dest) |>
   slice_max(arr_delay, n = 1, with_ties = FALSE) |>
@@ -350,3 +351,38 @@ We have used $\texttt{with\_ties}$ = FALSE to keep exactly one row per group, ot
 You can create groups using more than one variable. When you summarize a tibble grouped by more than one variable, each summary peels off the last group. To make it obvious what is happening dplyr displays a message that tells you how you can change this behaviour. To change the default behaviour we can set $\texttt{.groups}$ to "$\texttt{drop}$" ro drop all groupings or "$\texttt{keep}$" to preserve the same groups.
 
 You might also want to remove grouping from a data frame without using $\texttt{summarize()}$. You can do this with $\texttt{ungroup()}$. When you summarize an ungrouped data frame you get a single row back because dplyr treats all rows in an ungrouped data frame as belonging to one group.
+
+dplyr 1.1.0 includes new syntax for per-operation grouping, the $\texttt{.by}$ argument. The $\texttt{group\_by()}$ and $\texttt{ungroup()}$ verbs remain, but you can now also use the $\texttt{.by}$ argument to group within a single operation. $\texttt{.by}$ works with all verbs and has the advantage that you do not need to use the $\texttt{.groups}$ argument to suppress the grouping message or $\texttt{ungroup()}$ when you are done.
+
+---
+
+### Case Study
+
+Whenever you do any aggregation, it is always a good idea to include a count ($\texttt{n()}$) to ensure that you are not drawing conclusions based on very small amounts of data. Using the Lahman package we shall study baseball data on the proportion of at-bats a player gets a hit.
+
+```r
+# Code 12
+# Calculate the batter's average and plot against at-bats
+batters <- Lahman::Batting |>
+  group_by(playerID) |>
+  summarize(n = sum(AB, na.rm = TRUE),
+            average = sum(H, na.rm = TRUE) / sum(AB, na.rm = TRUE))
+
+batters |>
+  filter(n > 100) |>
+  ggplot(aes(x = n, y = average)) +
+  geom_point(alpha = 1/10) +
+  geom_smooth(se = FALSE)
+```
+
+![Alt text](../Outputs/Data_Transformation/Code_12.jpg)
+
+When we plot the batting average against the number of at-bats, we see two patterns. i) The variation in average is larger among players with fewer at-bats. ii) There is a positive correlation between batting average and the number of at-bats because teams want to give their best batter the most opportunities to score.
+
+This is an example of combining ggplot2 and dplyr. If you naively sort on $\texttt{desc(average)}$, the people with the best batting averages are clearly the ones that had few at-bats but happened to get a hit; they are not necessarily the most skilled players.
+
+---
+
+### Summary
+
+We have seen the tools that dplyr provides for working with data frames. The tools are roughly grouped into three categories: those that manipulate the rows (such as $\texttt{filter()}$ and $\texttt{arrange()}$), those that manipulate the columns (such as $\texttt{select()}$ and $\texttt{mutate()}$), and those that manipulate groups (such as $\texttt{group\_by()}$ and $\texttt{summarize()}$).

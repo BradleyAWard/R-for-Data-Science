@@ -1,5 +1,5 @@
 library(tidyverse)
-library(nycflights13)
+library(Lahman)
 
 # Code 1
 # All flights that departed more than two hours late
@@ -94,7 +94,22 @@ df |> slice_max(x, n = 1)
 df |> slice_sample(n = 1)
 
 # Code 11
+# Flights that are most delayed upon arrival
 flights |>
   group_by(dest) |>
   slice_max(arr_delay, n = 1, with_ties = FALSE) |>
   relocate(dest)
+
+# Code 12
+# Calculate the batter's average and plot against at-bats
+batters <- Lahman::Batting |>
+  group_by(playerID) |>
+  summarize(n = sum(AB, na.rm = TRUE),
+            average = sum(H, na.rm = TRUE) / sum(AB, na.rm = TRUE))
+
+batters |>
+  filter(n > 100) |>
+  ggplot(aes(x = n, y = average)) +
+  geom_point(alpha = 1/10) +
+  geom_smooth(se = FALSE)
+ggsave(filename = "Outputs/Data_Transformation/Code_12.jpg", width = 5, height = 4, dpi = 500)
