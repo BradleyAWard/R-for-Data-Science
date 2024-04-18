@@ -2,13 +2,13 @@
 
 Visualization is an important tool for generating insight, but it is rare that you get the data in exactly the right form you need to make the graph you want. Often you will need to create some new variables or summaries to answer your questions with your data. We shall introduce data transformation using the dplyr package and use a new dataset on flights that departed New York City in 2013.
 
-Take careful note of the conflict message that is printed when you load the tidyverse. It tells you that dplyr overwrites some functions in base R. If you want to use the base version of these functions after loading dplyr, you will need to use their full names, such as $\texttt{stats::filter()}$.
+Take careful note of the conflict message that is printed when you load the tidyverse. It tells you that dplyr overwrites some functions in base R. If you want to use the base version of these functions after loading dplyr, you will need to use their full names, such as `stats::filter()`.
 
 ---
 
 ### nycflights13
 
-To explore the basic dplyr verbs, we are going to use $\texttt{nycflights13::flights}$. This dataset contains all 336,776 flights that departed from New York City in 2013. $\texttt{flights}$ is a tibble, a special type of data frame used by the tidyverse to avoid some common gotchas. They are designed for large datasets, so when printing they only show the first few rows and only the columns that fit on one screen. If you are using RStudio, the most convenient way to view the full dataset is $\texttt{View(flights)}$, which will open an interactive scrollable and filterable view. Otherwise, you can use $\texttt{print(flights, width = inf)}$ to show all columns or $\texttt{glimpse()}$. In these views, the variables are followed by the variable type: $\texttt{<int>}$ for integer, $\texttt{<dbl>}$ for double (real numbers), $\texttt{<chr>}$ for character (strings), and $\texttt{<dttm>}$ for date-time.
+To explore the basic dplyr verbs, we are going to use `nycflights13::flights`. This dataset contains all 336,776 flights that departed from New York City in 2013. `flights` is a tibble, a special type of data frame used by the tidyverse to avoid some common gotchas. They are designed for large datasets, so when printing they only show the first few rows and only the columns that fit on one screen. If you are using RStudio, the most convenient way to view the full dataset is `View(flights)`, which will open an interactive scrollable and filterable view. Otherwise, you can use `print(flights, width = inf)` to show all columns or `glimpse()`. In these views, the variables are followed by the variable type: `<int>` for integer, `<dbl>` for double (real numbers), `<chr>` for character (strings), and `<dttm>` for date-time.
 
 ---
 
@@ -26,11 +26,11 @@ Because each verb does one thing well, solving complex problems will usually req
 
 ### Rows
 
-The most important verbs that operate on rows of a dataset are $\texttt{filter()}$, which changes which rows are present without changing their order, and $\texttt{arrange()}$ which changes the order of the rows without changing which are present. We will also discuss $\texttt{distinct()}$, which finds rows with unique values, but unlike $\texttt{arrange()}$ and $\texttt{filter()}$, it can also  optionally modify the columns.
+The most important verbs that operate on rows of a dataset are `filter()`, which changes which rows are present without changing their order, and `arrange()` which changes the order of the rows without changing which are present. We will also discuss `distinct()`, which finds rows with unique values, but unlike `arrange()` and `filter()`, it can also  optionally modify the columns.
 
-#### $\texttt{filter()}$
+#### `filter()`
 
-$\texttt{filter()}$ allows you to keep rows based on the values of the columns. The first argument is the data frame. The second and subsequent arguments are the conditions that must be true to keep the row.
+`filter()` allows you to keep rows based on the values of the columns. The first argument is the data frame. The second and subsequent arguments are the conditions that must be true to keep the row.
 
 ```r
 # Code 1
@@ -56,11 +56,11 @@ flights |>
   filter(month %in% c(1, 2))
 ```
 
-When you run $\texttt{filter()}$, dplyr executes the filtering operation, creating a new data frame and then prints it. dplyr functions never modify their inputs, so to save the result you need to use the assignment operator.
+When you run `filter()`, dplyr executes the filtering operation, creating a new data frame and then prints it. dplyr functions never modify their inputs, so to save the result you need to use the assignment operator.
 
-#### $\texttt{arrange()}$
+#### `arrange()`
 
-$\texttt{arrange()}$ changes the order of the rows based on the value of the columns. It takes a date frame and a set of column names to order by. If you provide more than one column name, each additional column will be used to break ties in the values of preceding columns. For example, the following code sorts the data by the departure time:
+`arrange()` changes the order of the rows based on the value of the columns. It takes a date frame and a set of column names to order by. If you provide more than one column name, each additional column will be used to break ties in the values of preceding columns. For example, the following code sorts the data by the departure time:
 
 ```r
 # Code 3
@@ -90,7 +90,7 @@ flights |>
 # ℹ Use `print(n = ...)` to see more rows
 ```
 
-You can use $\texttt{desc()}$ on a column inside of $\texttt{arrange()}$ to reorder the data frame based on that column in descending order. For example, this code orders flights from most to least delayed:
+You can use `desc()` on a column inside of `arrange()` to reorder the data frame based on that column in descending order. For example, this code orders flights from most to least delayed:
 
 ```r
 # Code 4
@@ -120,9 +120,9 @@ flights |>
 # ℹ Use `print(n = ...)` to see more rows
 ```
 
-#### $\texttt{distinct()}$
+#### `distinct()`
 
-$\texttt{distinct()}$ finds all the unique rows in a dataset. Most of the time, however, you will want the distinct combination of some variables, so you can also optionally supply column names:
+`distinct()` finds all the unique rows in a dataset. Most of the time, however, you will want the distinct combination of some variables, so you can also optionally supply column names:
 
 ```r
 # Code 5
@@ -135,17 +135,17 @@ flights |>
   distinct(origin, dest)
 ```
 
-Alternatively, if you want to keep the other columns when filtering for unique rows, you can use the $\texttt{.keep\_all}$ = TRUE option. If you want to find the number of occurrences instead, you are better off swapping $\texttt{distinct()}$ for $\texttt{count()}$, and with the $\texttt{sort}$ = TRUE argument you can arrange them in descending order of number of occurrences.
+Alternatively, if you want to keep the other columns when filtering for unique rows, you can use the `.keep_all = TRUE` option. If you want to find the number of occurrences instead, you are better off swapping `distinct()` for `count()`, and with the `sort = TRUE` argument you can arrange them in descending order of number of occurrences.
 
 ---
 
 ### Columns
 
-There are four important verbs that affect the columns without changing the rows: $\texttt{mutate()}$ creates new columns that are derived from the existing columns, $\texttt{select()}$ changes which columns are present, $\texttt{rename()}$ changes the names of the columns and $\texttt{relocate()}$ changes the positions of the columns.
+There are four important verbs that affect the columns without changing the rows: `mutate()` creates new columns that are derived from the existing columns, `select()` changes which columns are present, `rename()` changes the names of the columns and `relocate()` changes the positions of the columns.
 
-#### $\texttt{mutate()}$
+#### `mutate()`
 
-The job of $\texttt{mutate()}$ is to add new columns that are calculated from the existing columns. In the following we use $\texttt{mutate()}$ to calculate the gain (how much time a delayed flight made up in the air) and average speed.
+The job of `mutate()` is to add new columns that are calculated from the existing columns. In the following we use `mutate()` to calculate the gain (how much time a delayed flight made up in the air) and average speed.
 
 ```r
 # Code 6
@@ -177,11 +177,11 @@ flights |>
 # ℹ Use `print(n = ...)` to see more rows
 ```
 
-By default, $\texttt{mutate()}$ adds new columns on the right side of your dataset. We can use the $\texttt{.before}$ argument to add the variables to the left side. The . is a sign that $\texttt{.before}$ is an argument to the function, not the name of a new variable. You can also use $\texttt{.after}$ to add after a variable, and in both $\texttt{.before}$ and $\texttt{.after}$ you can use the variable name instead of a position. Alternatively, you can control which variables are kept with the $\texttt{.keep}$ argument. A particularly useful argument is $\texttt{.keep}$ = "used", which specifies that we keep only the columns that were involved or created in the $\texttt{mutate()}$ step.
+By default, `mutate()` adds new columns on the right side of your dataset. We can use the `.before` argument to add the variables to the left side. The . is a sign that `.before` is an argument to the function, not the name of a new variable. You can also use `.after` to add after a variable, and in both `.before` and `.after` you can use the variable name instead of a position. Alternatively, you can control which variables are kept with the `.keep` argument. A particularly useful argument is `.keep = "used"`, which specifies that we keep only the columns that were involved or created in the `mutate()` step.
 
-#### $\texttt{select()}$
+#### `select()`
 
-It is not uncommon to get datasets with hundreds of variables. In this situation, the first challenge is often just focusing on the variables you are interested in. $\texttt{select()}$ allows you to rapidly zoom in on a useful subset using operations based on the names of the variables:
+It is not uncommon to get datasets with hundreds of variables. In this situation, the first challenge is often just focusing on the variables you are interested in. `select()` allows you to rapidly zoom in on a useful subset using operations based on the names of the variables:
 
 ```r
 # Code 7
@@ -202,23 +202,23 @@ flights |>
   select(where(is.character))
 ```
 
-There are a number of helper functions you can use within select: $\texttt{starts\_with("abc")}$ - matches names that begin with "abc"; $\texttt{ends\_with("abc")}$ - matches names that end with "abc"; $\texttt{contains("abc")}$ - matches names that contain "abc"; $\texttt{num\_range("x", 1:3)}$ - matches x1, x2 and x3.
+There are a number of helper functions you can use within select: `starts_with("abc")` - matches names that begin with "abc"; `ends_with("abc")` - matches names that end with "abc"; `contains("abc")` - matches names that contain "abc"; `num_range("x", 1:3)` - matches x1, x2 and x3.
 
-You can rename variables as you $\texttt{select()}$ them using =. The new name appears on the left side of the =, and the old variable appears on the right side.
+You can rename variables as you `select()` them using =. The new name appears on the left side of the =, and the old variable appears on the right side.
 
-#### $\texttt{rename()}$
+#### `rename()`
 
-If you want to keep all the existing variables and just want to rename a few, you can use $\texttt{rename()}$ instead of $\texttt{select()}$. If you have a bunch of inconsistently named columns and it would be painful to fix them all by hand, $\texttt{janitor::clean\_names()}$ provides some useful automated cleaning.
+If you want to keep all the existing variables and just want to rename a few, you can use `rename()` instead of `select()`. If you have a bunch of inconsistently named columns and it would be painful to fix them all by hand `janitor::clean_names()` provides some useful automated cleaning.
 
-#### $\texttt{relocate()}$
+#### `relocate()`
 
-Use $\texttt{relocate}$ to move variables around. You might want to collect related variables together or move important variables to the front. By default $\texttt{relocate()}$ moves variables to the front. You can also specify where to put them using the $\texttt{.before}$ and $\texttt{.after}$ arguments just like in $\texttt{mutate()}$.
+Use `relocate` to move variables around. You might want to collect related variables together or move important variables to the front. By default `relocate()` moves variables to the front. You can also specify where to put them using the `.before` and `.after` arguments just like in `mutate()`.
 
 ---
 
 ### The Pipe
 
-The pipe is a powerful tool for combining multiple verbs. For example, imagine that you wanted to find the fastest flights to Houston's IAH airport: you need to combine $\texttt{filter()}$, $\texttt{mutate()}$, $\texttt{select()}$ and $\texttt{arrange()}$:
+The pipe is a powerful tool for combining multiple verbs. For example, imagine that you wanted to find the fastest flights to Houston's IAH airport: you need to combine `filter()`, `mutate()`, `select()` and `arrange()`:
 
 ```r
 # Code 8
@@ -254,15 +254,15 @@ flights |>
 
 ### Groups
 
-dplyr gets more powerful when you add in the ability to work with groups. Here we will focus on the most important functions: $\texttt{group\_by()}$, $\texttt{summarize()}$ and the slice family of functions.
+dplyr gets more powerful when you add in the ability to work with groups. Here we will focus on the most important functions: `group_by()`, `summarize()` and the slice family of functions.
 
-#### $\texttt{group\_by()}$
+#### `group_by()`
 
-Use $\texttt{group\_by()}$ to divide your dataset into groups meaningful for your analysis. $\texttt{group\_by()}$ does not change the data, but all subsequent operations will now work on the groupings. $\texttt{group\_by()}$ adds this grouped feature (referred to as *class*) to the data frame, which changes the behaviour of the subsequent verbs applied to the data. 
+Use `group_by()` to divide your dataset into groups meaningful for your analysis. `group_by()` does not change the data, but all subsequent operations will now work on the groupings. `group_by()` adds this grouped feature (referred to as *class*) to the data frame, which changes the behaviour of the subsequent verbs applied to the data. 
 
-#### $\texttt{summarize()}$
+#### `summarize()`
 
-The most important grouped operation is a summary, which, if being used to calculate a single summary statistic, reduces the data frame to have a single row for each group. Often you will find that all results from $\texttt{summarize()}$ return NAs. This happens when some of the data has missing values, so when calculating summary statistics, we get an NA result. We can tell the function to ignore all missing values by setting the argument $\texttt{na.rm}$ to TRUE. You can create any number of summaries in a single call to $\texttt{summarize()}$; one useful summary is $\texttt{n()}$, which returns the number of rows in each group.
+The most important grouped operation is a summary, which, if being used to calculate a single summary statistic, reduces the data frame to have a single row for each group. Often you will find that all results from `summarize()` return NAs. This happens when some of the data has missing values, so when calculating summary statistics, we get an NA result. We can tell the function to ignore all missing values by setting the argument `na.rm` to TRUE. You can create any number of summaries in a single call to `summarize()`; one useful summary is `n()`, which returns the number of rows in each group.
 
 ```r
 # Code 9
@@ -313,7 +313,7 @@ df |> slice_max(x, n = 1)
 df |> slice_sample(n = 1)
 ```
 
-You can vary $\texttt{n}$ to select more than one row, or you can use $\texttt{prop}$ to select a fraction between 0 and 1 of the rows in each group. The following example finds the flights that are most delayed upon arrival at each destination:
+You can vary `n` to select more than one row, or you can use `prop` to select a fraction between 0 and 1 of the rows in each group. The following example finds the flights that are most delayed upon arrival at each destination:
 
 ```r
 # Code 11
@@ -346,19 +346,19 @@ flights |>
 # ℹ Use `print(n = ...)` to see more rows
 ```
 
-We have used $\texttt{with\_ties}$ = FALSE to keep exactly one row per group, otherwise tied rows would both be included. This method is similar to computing the max delay with $\texttt{summarize()}$, but you get the whole corresponding row instead of a single summary statistic.
+We have used `with_ties = FALSE` to keep exactly one row per group, otherwise tied rows would both be included. This method is similar to computing the max delay with `summarize()`, but you get the whole corresponding row instead of a single summary statistic.
 
-You can create groups using more than one variable. When you summarize a tibble grouped by more than one variable, each summary peels off the last group. To make it obvious what is happening dplyr displays a message that tells you how you can change this behaviour. To change the default behaviour we can set $\texttt{.groups}$ to "$\texttt{drop}$" ro drop all groupings or "$\texttt{keep}$" to preserve the same groups.
+You can create groups using more than one variable. When you summarize a tibble grouped by more than one variable, each summary peels off the last group. To make it obvious what is happening dplyr displays a message that tells you how you can change this behaviour. To change the default behaviour we can set `.groups` to `"drop"` ro drop all groupings or `"keep"` to preserve the same groups.
 
-You might also want to remove grouping from a data frame without using $\texttt{summarize()}$. You can do this with $\texttt{ungroup()}$. When you summarize an ungrouped data frame you get a single row back because dplyr treats all rows in an ungrouped data frame as belonging to one group.
+You might also want to remove grouping from a data frame without using `summarize()`. You can do this with `ungroup()`. When you summarize an ungrouped data frame you get a single row back because dplyr treats all rows in an ungrouped data frame as belonging to one group.
 
-dplyr 1.1.0 includes new syntax for per-operation grouping, the $\texttt{.by}$ argument. The $\texttt{group\_by()}$ and $\texttt{ungroup()}$ verbs remain, but you can now also use the $\texttt{.by}$ argument to group within a single operation. $\texttt{.by}$ works with all verbs and has the advantage that you do not need to use the $\texttt{.groups}$ argument to suppress the grouping message or $\texttt{ungroup()}$ when you are done.
+dplyr 1.1.0 includes new syntax for per-operation grouping, the `.by` argument. The `group_by()` and `ungroup()` verbs remain, but you can now also use the `.by` argument to group within a single operation. `.by` works with all verbs and has the advantage that you do not need to use the `.groups` argument to suppress the grouping message or `ungroup()` when you are done.
 
 ---
 
 ### Case Study
 
-Whenever you do any aggregation, it is always a good idea to include a count ($\texttt{n()}$) to ensure that you are not drawing conclusions based on very small amounts of data. Using the Lahman package we shall study baseball data on the proportion of at-bats a player gets a hit.
+Whenever you do any aggregation, it is always a good idea to include a count `n()` to ensure that you are not drawing conclusions based on very small amounts of data. Using the Lahman package we shall study baseball data on the proportion of at-bats a player gets a hit.
 
 ```r
 # Code 12
@@ -379,10 +379,10 @@ batters |>
 
 When we plot the batting average against the number of at-bats, we see two patterns. i) The variation in average is larger among players with fewer at-bats. ii) There is a positive correlation between batting average and the number of at-bats because teams want to give their best batter the most opportunities to score.
 
-This is an example of combining ggplot2 and dplyr. If you naively sort on $\texttt{desc(average)}$, the people with the best batting averages are clearly the ones that had few at-bats but happened to get a hit; they are not necessarily the most skilled players.
+This is an example of combining ggplot2 and dplyr. If you naively sort on `desc(average)`, the people with the best batting averages are clearly the ones that had few at-bats but happened to get a hit; they are not necessarily the most skilled players.
 
 ---
 
 ### Summary
 
-We have seen the tools that dplyr provides for working with data frames. The tools are roughly grouped into three categories: those that manipulate the rows (such as $\texttt{filter()}$ and $\texttt{arrange()}$), those that manipulate the columns (such as $\texttt{select()}$ and $\texttt{mutate()}$), and those that manipulate groups (such as $\texttt{group\_by()}$ and $\texttt{summarize()}$).
+We have seen the tools that dplyr provides for working with data frames. The tools are roughly grouped into three categories: those that manipulate the rows (such as `filter()` and `arrange()`), those that manipulate the columns (such as `select()` and `mutate()`), and those that manipulate groups (such as `group_by()` and `summarize()`).
