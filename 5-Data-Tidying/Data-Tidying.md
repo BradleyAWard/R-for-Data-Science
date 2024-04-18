@@ -13,7 +13,7 @@ There are three interrelated rules that make a dataset tidy:
 
 There are two main advantages to tidy data: i) if you have a consistent data structure it is easier to learn the tools that work with it because they have an underlying uniformity, and ii) most built-in R functions work with vectors of values, which is easier with variables in columns.
 
-Most analyses will require at least a little tidying. First you begin by figuring out what the underlying variables and observations are, then you pivot your data into a tidy form, with variables in the columns and observations in the rows. tidyr provides two functions for pivoting data: $\texttt{pivot\_longer()}$ and $\texttt{pivot\_wider()}$.
+Most analyses will require at least a little tidying. First you begin by figuring out what the underlying variables and observations are, then you pivot your data into a tidy form, with variables in the columns and observations in the rows. tidyr provides two functions for pivoting data: `pivot_longer()` and `pivot_wider()`.
 
 ---
 
@@ -51,7 +51,7 @@ billboard
 # ℹ Use `print(n = ...)` to see more rows
 ```
 
-In this dataset, each observation is a song. The first three columns are variables that describe the song, then we have 76 columns that describe the rank of the song each week. The song is included as long as it was in the top 100 at some point in 2000. Here, the column names are one variable (the week), and the cell values are another (the rank). To tidy this data we will use $\texttt{pivot\_longer()}$.
+In this dataset, each observation is a song. The first three columns are variables that describe the song, then we have 76 columns that describe the rank of the song each week. The song is included as long as it was in the top 100 at some point in 2000. Here, the column names are one variable (the week), and the cell values are another (the rank). To tidy this data we will use `pivot_longer()`.
 
 ```r
 # Code 2
@@ -81,9 +81,9 @@ billboard |>
 # ℹ Use `print(n = ...)` to see more rows
 ```
 
-There are three key arguments to $\texttt{pivot\_longer()}$: $\texttt{cols}$ specifies which columns need to be pivoted (i.e. which columns are not variables); $\texttt{names\_to}$ which specifies the variable stored in the column names - which we named "week"; and $\texttt{values\_to}$ which specifies the variable stored in the cell values - which we named "rank". Note that 2 Pac's "Baby Don't Cry" was only in the top 100 for 7 weeks, and all the remaining weeks were filled in with missing values. We can get rid of them in our restructured dataset by setting $\texttt{values\_drop\_na}$ = TRUE.
+There are three key arguments to `pivot_longer() : cols` specifies which columns need to be pivoted (i.e. which columns are not variables); `names_to` which specifies the variable stored in the column names - which we named "week"; and `values_to` which specifies the variable stored in the cell values - which we named "rank". Note that 2 Pac's "Baby Don't Cry" was only in the top 100 for 7 weeks, and all the remaining weeks were filled in with missing values. We can get rid of them in our restructured dataset by setting `values_drop_na = TRUE`.
 
-This data is now tidy, but we could make future computation easier by converting values of week from character strings to numbers using $\texttt{mutate()}$ and $\texttt{readr::parse\_number()}$ which extracts the first number from a string.
+This data is now tidy, but we could make future computation easier by converting values of week from character strings to numbers using `mutate()` and `readr::parse_number()` which extracts the first number from a string.
 
 ```r
 # Code 3
